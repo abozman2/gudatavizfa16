@@ -1,0 +1,21 @@
+---
+title: "Untitled"
+author: "Adam Bozman"
+date: "September 28, 2016"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+```{r cars}
+summary(cars)
+```
+
+```{r}
+dim(mtcars)
+```
+
