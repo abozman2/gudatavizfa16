@@ -1,0 +1,143 @@
+---
+title: "Cleaning and Manipulating Data"
+author: "Adam Bozman"
+date: "October 2, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Data Processing with dplyr & tidyr
+
+## tidyr Operations 
+
+> gather() function
+
+Essentially, the *gather()* function enables the consolidation of data.  That which is spread out horizentally, and that which is not easily read will be rearanged vertically.  It will take common attributes and gather them together as single variables.  
+
+> seperate() function
+
+This takes a single variable into two.  In contrast to the *gather()* function, we have the *separate()* function.  Here, we are able to take a column that captures multiple variables and seperate the variables into multiple charecters and columns.  
+
+> unite() function
+
+Merging two variables into one.  This is to enable any moment where we may want to unite two variables into one.  
+
+> spread() function
+
+The *spread()* function is a complement and counter to the *gather()* function.  It is used in data manipulation when a long(vertical) dataset should be formatted to a wide(horizontal).
+
+## dplyr Operations 
+
+> select() function
+
+When interested in only a few selected variables, we use the *select()* function.  Within our *select()* function, we can include those columns which we hope to analyze.  
+
+e.g. select(Division, State, x20007:x2011)
+
+> filter(function)
+
+If we only desire certain outcomes, we may filter the results with this function.  For example, in a dataset of multiple U.S. states we may filter a selection of states that are a specific size or region.  
+
+> group by() function
+
+This function allows us to group by categorical variables.  If we have multiple variables in our dataset, or columns, and we would like to see the impact and correlation of a select few then we should use the *group by()* function.  
+
+> summarise() function
+
+This function needs little explanation.  This function allows us to perform all general summary statistics in one motion.  It may be used for preliminary exploration.  
+
+> arrange() function 
+
+The arrange option allows us to organize and view specific variables in ascending and decending order, showing impact on the dataset.  
+
+> join() function
+
+If we have multiple *dataframes* then we may join them using the *join()* function.  These are joined using and displaying common variables.  
+
+> mutate() function
+
+The mutate function allows us to add an entirely new, or a variable that is the function of a current variable.  This enables further data analysis without re-entering a relatively large dataset.  
+
+# Tidy data
+
+## 12.1 Intro
+
+With this reading, the objective is to understand and apply tidy data and the tidyr package.  
+
+## 12.2 Tidy data
+
+> In a *tidy dataset* there are three neccessary charecteristics. 
+  + Each variable must have its own column.
+  + Each observation must have its own row.
+  + Each value must have its own cell. 
+
+## 12.3 Spreading and gathering 
+
+> Because datasets are general not *tidy*, we must first organize them in such a way.  One of two common issues may come up.  To resolve these, you can use tidyer functions: *gather()* and *spread()*.  
+  + One variable might be spread across multiple columns.  
+  + One observation might be scattered across multiple rows.  
+We must be sure not to seperate variables from values of those variables.  Likewise, we need to avoid spreding ovservations accross two or more rows. 
+
+## 12.4 Seperating and uniting 
+
+> To continue tidying our data, we will need to use the *seperate()* and *unite()* functions.  We will seperate only if a column contains two variables.  In contrast, we will unite if we need to combine multiple columns.  
+
+## 12.5 Missing values
+
+Values often are missing from datasets and representations of those sets.  However, the way in which data is represented can cause certain data values to appear missing when they are not in reality.  This is the difference between *implicit* and *explicit* data, where implicit data is the data the may be innapropriately represented.  On the other hand, explicit data is the abscence of data altogether.  The *complete()* function allows us to make missing values explicit in tidy data.  
+
+To fill these abscences, we can use the *fill()* function.  This will replace missing values with the "most recent non-missing value".  
+
+# Going deeper with dplyr
+
+## Loading dplyr and the nycflights13 dataset
+
+## Choosing columns 
+
+> Choosing columns can be difficult when trying to display and highlight specific data.  The *select()* function shows specific columns.  Moreover, a minus sign (-) can remove selected columns if this is more appropriate for your dataset.  The minus symbol may also be used to hide a range of columns (-(k:l)), and hide columns that include specific variables, (-contains("time")).  You may also use the (=) symbol to equate and rename columns/variables.  
+
+## Choosing rows
+
+> Row selection acts similar to column selection, but with different functions.  To choose multiple conditions, use the function *filter()*.  The *slice()* function allows the user to keep a selection of rows within a group (slice(1:3)).  to sample three random rows or select the three rows from each group with the top use the *sample()* function and *top_n(3, dep_delay)*, respectively.  You can also sort the dep_delay, _arrange(desc(dep_delay))_ in a descending order.  Unique rows may be selected with *unique()* 
+
+## Adding new variables 
+
+> Adding new variables here uses similar function as the same process in tidyr.  The *mutate()* function creates a new variable.  The *transmute()* function creates a new variable, erasing all others.  Like my mentioned explicit variables earlier, 
+
+## Grouping and counting
+
+> If you're interested in grouping and analyzing a specific variable then you can use the *group_by()* function to highlight your selected category.  To compare and generalize data with this *group*, use the *summarise()* function to look at the data pattern.  
+
+## Choosing data frames 
+
+> Choosing a data frame allows for a selection of collumn types and names, organizing data in a comprehensible way.  Use function *data_frame()* to explore these options.  
+
+## Joining (merging) tables
+
+> Joining a number of tables is easy! *R* will take the constant variables and include every tables results, situated accordingly.  
+  + *full_join()*
+  + *left_join()*
+  + *right_join()*
+  + *semi_join()*
+  + *anti_join()*
+
+## Viewing more output
+
+> To see all rows, all columns, or some of each, us the *print(n = Inf)* and *print(width = Inf)*, respectively.  
+
+# dplyr with NYC flights
+
+### Exploring Data:
+
+```{r}
+library(nycflights13)
+data(flights)
+```
+
+```{r}
+library(nycflights13)
+dim(flights)
+```
