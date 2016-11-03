@@ -1,0 +1,25 @@
+---
+title: "Skyscraper Center"
+author: "Adam Bozman"
+date: "October 10, 2016"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+title: "Skyscraper Data"
+# Buildings in each city
+```{r}
+tallestbuildings %>%
+  group_by(City) %>%
+  summarise(Building_count = n()) %>%
+  arrange(desc(Building_count))
+```
+
+# Plot Cities by mean height of buildings 
+```{r}
+ggplot(tallestbuildings, aes(City, Height..ft.) + geom_bar()
+```
+

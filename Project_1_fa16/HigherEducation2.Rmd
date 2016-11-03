@@ -1,0 +1,170 @@
+---
+title: "Higher Education"
+author: "Adam Bozman & Kelsey Bajet"
+date: "November 2, 2016"
+output: html_document
+---
+# The Gender Binary and its resolute, immovable standards
+It's opinions in the professional world.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, include=FALSE}
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(stringr)
+```
+
+```{r, include=FALSE}
+load("EdGenderWork.Rda")
+EdGeWork <- EdGenderWork %>% select(21,24,29,30,31,47:52,64:118,138:142,148:152)
+```
+
+# The ‘Gender Binary’ and its resolute, immovable opinions in the professional world 
+
+  Using the Pew Research Center's Higher Education, Gender, and Work dataset, we decided to look at how gender and education levels influence opinions in the workplace. The opinion topics range from gender equality, gender discrimination, and discrimination and its impact in the workplace. 
+
+  Despite contemporary equality movements and equalization efforts, a stark contrast between the treatment of men and women remains.  In turn with this sociological plateau there comes an ideological separation, and moreover a difference in opinions between men and women.  Of course, factors such as education, worth, and opportunity affect the opinion of the masses.  Here, we analyze these factors.  
+
+## Opinions on gender equality in society
+ 
+### Have you ever been discriminated against at work because of your gender, or has this never happened to you?
+ 
+  Participants were asked, "Do you think society generally treats men and women equally, or does it favor women over men, or men over women?" Of the population surveyed, more women believe that men are favored over women. Not surprisingly, 51 more men believe that men and women are treated equally rather than men being favored over women. Also, 121 men believe that women are favored over men in society. This may be due to the rising wave of feminism or feministic ideas.
+ 
+```{r}
+  
+EdGeWork$sex <- factor(EdGeWork$sex, levels= c(1,2), labels = c("male","female"))
+EdGeWork$q4 <- factor(EdGeWork$q4, levels= c(1,2,3), labels = c("Men and women equally","Women over men","Men over women"))
+
+Society<- EdGeWork %>% 
+  group_by(sex) %>% 
+  count(q4)
+
+Society=Society[Society$q4 %in% c("Men and women equally","Women over men", "Men over women"),]
+
+names(Society) <- c("sex","q4","resp")
+
+Society %>%
+  ggplot(aes(q4,resp,fill=sex)) + geom_bar(position="dodge",stat="identity") + ylab("Number of Participants") + xlab("Opinions") + coord_flip() + labs(title="Opinions on Gender Equality by Gender",fill="Sex") 
+
+
+```
+
+# Education Levels and Discrimination for both genders
+
+  Participants were also asked, "Have you ever been discriminated against at work because of your gender, or has this never happened to you?"  More participants who have been discriminated against at work based on their gender have been individuals High School degrees and four year’s experience in college.  In these categories more women have been discriminated against than men, especially women with post-graduate degrees.  To make an assumption about this pattern, it seems that with higher education, and subsequently more prestigious careers that women are increasingly discriminated against.  
+
+```{r}
+
+EdGeWork$educ2 = EdGeWork$educ2 <- factor(EdGeWork$educ2,levels=c(1,2,3,4,5,6,7,8),labels=c("Less than high school","High school incomplete","High school graduate","Some college, no degree","Two year associate degree from a college or university","Four year college or university degree/Bachelor's degree","Some postgraduate or professional schooling, no postgraduate degree","Postgraduate or professional degree, including master's, doctorate, medical or law degree"))
+EdGeWork$qd1 = EdGeWork$qd1 <- factor(EdGeWork$qd1,levels=c(1,2),labels=c("Yes","No"))
+
+EdGeWork=EdGeWork[EdGeWork$educ2 %in% c("Less than high school","High school incomplete","High school graduate","Some college, no degree","Two year associate degree from a college or university","Four year college or university degree/Bachelor's degree","Some postgraduate or professional schooling, no postgraduate degree","Postgraduate or professional degree, including master's, doctorate, medical or law degree"),]
+
+EduD <- EdGeWork %>% 
+  group_by(sex,educ2) %>% 
+  count(qd1)
+
+EduD=EduD[EduD$qd1 %in% c("Yes"),]
+
+names(EduD) <- c("sex","educ2","qd1","resp")
+
+EduD %>% ggplot(aes(x=educ2,y=factor(resp),fill=sex,position="dodge")) + geom_bar(stat="identity",position=position_dodge(width=1.1)) + coord_flip() + ylab("Number of Participants") + xlab("Education") + labs(title="Gender Discrimination by Education Level",fill="") + scale_x_discrete(labels = function(Education) str_wrap(Education, width = 40))
+
+
+```
+
+# Discrimination and its Impact in the Workplace
+
+  As a general rule, it is still assumed that men are given a priority treatment with more opportunities available.  We can see that among those who have been discriminated against, it is significantly more likely that they assume men are given preferential treatment.  In stride with that, we can infer that the majority of the population either favors men or treats men and women equally to some degree.  This likely stems from the lingering degredation of women in previous generations and the still inadequate feminsist rights movement.  
+
+```{r}
+
+library(car)
+
+EdGeWork$qd1=recode(EdGeWork$qd1, "'yes'; 'no'; 'refused'")
+
+str(EdGeWork$q4)
+
+EdGeWork$q4=recode(EdGeWork$q4, "1='Men and women equally'; 2='Women over men'; 3='Men over women'")
+
+str(EdGeWork$sex)
+summary(EdGeWork$sex)
+EdGeWork$sex=recode(EdGeWork$sex, "1='male'; 2='female'")
+
+
+GenC <- EdGeWork %>%
+  group_by(q4) %>%
+  count(qd1)
+
+GenC=GenC[GenC$q4 %in% c("Men and women equally","Women over men", "Men over women"),]
+
+names(GenC) <- c("q4","qd1","sex")
+
+GenC %>% ggplot(aes(q4,sex,fill=qd1)) + geom_bar(stat="identity",position="dodge") + coord_flip()+labs(title="In today's world, who is given priority treatment?",fill="Discriminated Against?") + xlab("Opinion") + ylab("Number of Participants") 
+  
+```
+
+# Education and Change in Gender Equality
+
+Participants were asked the following: 
+
+Which of these two statements comes closer to your own views-even if neither is exactly right? 
+
+1. This country has made the changes needed to give men and women equality in the workplace
+
+2. This country needs to continue making changes to give men and women equality
+in the workplace
+
+  Based on the graph below, participants in all education levels believe that the US needs to continue making changes to give men and women equality in the workplace. But the highest number of participants who believe the country needs to continue making changes to give men and women equality were participants with High School diplomas or GED certificates and participants with a university degree or Bachelor's degree.
+
+```{r}
+
+EdGeWork$q43 <- factor(EdGeWork$q43, levels=c(1,2),labels=c("Has Made Change","Needs to Make Change"))
+
+GenEqual <- EdGeWork %>%
+  group_by(educ2) %>%
+  count(q43)
+
+GenEqual=GenEqual[GenEqual$q43 %in% c("Has Made Change","Needs to Make Change"),]
+
+names(GenEqual) <- c("educ2","q43","resp")
+
+GenEqual %>% ggplot(aes(educ2,resp,fill=q43)) + geom_bar(stat="identity",position="dodge") + coord_flip() + labs(title="Opinions on Working Towards Gender Equality in the Workplace",fill="Opinion") + xlab("Education Level") + ylab("Number of Participants") + scale_x_discrete(labels = function(Education) str_wrap(Education, width = 40))
+
+```
+
+# The ability of men and women to obtain executive jobs 
+
+  Universally, we may gather here that any efforts toward gender equality in the workplace have been unsuccessful.  Using prerequisite education as our separating variable, we understand that despite job quality or prestige, inequality still exists.
+
+```{r}
+
+library(car)
+ 
+str(EdGeWork$q44)
+ 
+str(EdGeWork$sex)
+summary(EdGeWork$sex)
+ 
+GenC <- EdGeWork %>%
+  group_by(sex) %>%
+  count(q44)
+ 
+GenC$q44 <- factor(GenC$q44, levels=c(1,2,3),labels=c("Easier for men","Easier for women", "No Difference"))
+ 
+GenC=GenC[GenC$q44 %in% c("Easier for men","Easier for women", "No Difference"),]
+ 
+names(GenC) <- c("sex","q44","resp")
+ 
+GenC %>% ggplot(aes(sex,resp,fill=q44)) + geom_bar(stat="identity",position="dodge") + coord_flip()+labs(title="How hard do you think it is for men and women to get top executive jobs in business or government these days?",fill="Response") + xlab("Sex") + ylab("Number of Participants")
+
+```
+
+  Contemporary efforts have clearly impacted the demographics and idealogy of the american workforce.  Though, the impact of these efforts is minimal relative to their expecation.  

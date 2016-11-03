@@ -1,0 +1,32 @@
+---
+title: "Project_1"
+author: "Adam Bozman"
+date: "October 19, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+```{r}
+load("EdGenderWork.Rda")
+EGW <- EdGenderWork %>% 
+  select(24, 29, 31, 47:52, 64:118, 138:142, 148:152)
+```
+
+```{r}
+EGW$sex <- factor(EGW$sex, levels = c(1,2), labels = c("male", "female")) %>%
+EGW$q4 <- factor(EGW$q4, levels = c(1,2,3), labels = c("Men and women  equally", "women over men", "Men over women")) %>%
+EGW %>% 
+  group_by(sex) %>%
+  count(q4)
+```
+
