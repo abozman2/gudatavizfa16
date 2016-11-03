@@ -1,0 +1,272 @@
+---
+title: "Higher Education"
+author: "Kelsey Bajet"
+date: "October 18, 2016"
+output: pdf_document
+---
+# The Gender Binary and its resolute, immovable standards
+It's opinions in the professional world.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r, include=FALSE}
+library(magrittr)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+```
+
+```{r, include=FALSE}
+load("EdGenderWork.Rda")
+EdGeWork <- EdGenderWork %>% select(21,24,29,30,31,47:52,64:118,138:142,148:152)
+```
+
+# Education Levels and Discrimination for both genders DONE
+ 
+### Have you ever been discriminated against at work because of your gender, or has this never happened to you?
+ 
+```{r}
+  
+fix_labels <- function(x, TextIfMissing) {
+    val <- attr(x, "labels", exact = TRUE)
+    if (is.null(val)) TextIfMissing else val
+  }
+  
+  mylabels=fix_labels(EdGeWork$sex,NA)
+  statedf=data.frame(Code=mylabels,State=names(mylabels))
+  EdGeWork$sexlabelled=statedf$State[match(EdGeWork$state,statedf$Code)]
+  
+   mylabels=fix_labels(EdGeWork$q4,NA)
+  statedf=data.frame(Code=mylabels,State=names(mylabels))
+  EdGeWork$q4labelled=statedf$State[match(EdGeWork$state,statedf$Code)]
+  
+  ggplot(EdGeWork, aes(x=q4labelled, fill=sexlabelled)) + geom_bar(stat="count")
+ 
+```
+
+# Education Levels and Discrimination for both genders (educ, sex, D1)
+
+```{r}
+
+EdGeWork$educ2 = EdGeWork$educ2 <- factor(EdGeWork$educ2,levels=c(1,2,3,4,5,6,7,8),labels=c("Less HS","Inc HS","HS","SC","2YR","4YR","PG","PGD"))
+EdGeWork$qd1 = EdGeWork$qd1 <- factor(EdGeWork$qd1,levels=c(1,2),labels=c("Yes","No"))
+EdGeWork$sex = EdGeWork$sex <- factor(EdGeWork$sex, levels= c(1,2), labels = c("male","female"))
+ 
+EduD <- EdGeWork %>%
+  group_by(sex,educ2) %>%
+  count(qd1)
+ 
+names(EduD) <- c("sex","educ2","qd1","resp")
+ 
+EduD %>% ggplot(aes(x=factor(educ2),y=factor(resp),fill=qd1,color=sex,position="dodge")) + geom_bar(stat="identity",position=position_dodge(width=1.1)) + scale_color_manual(values=c("dark red","purple")) + scale_fill_manual(values=c("pink","lightblue"))
+
+```
+
+# Discrimination and its Impact in the Workplace (D1-D3, q4) !!
+
+d1
+```{r}
+
+EdGeWork$qd1 <- factor(EdGeWork$qd1, levels=c(1,2),labels=c("Yes","No"))
+ 
+Discrimination <- EdGeWork %>%
+  group_by(sex) %>%
+  count(qd1)
+ 
+names(Discrimination) <- c("educ2","q43","resp")
+ 
+GenEqual %>% ggplot(aes(qd1,resp,fill=sex)) + geom_bar(stat="identity",position="dodge")
+
+
+
+
+
+
+
+
+
+
+
+  fix_labels <- function(x, TextIfMissing) {
+    val <- attr(x, "labels", exact = TRUE)
+    if (is.null(val)) TextIfMissing else val
+  }
+  
+  mylabels=fix_labels(EdGeWork$qd1,NA)
+  statedf=data.frame(Code=mylabels,State=names(mylabels))
+  EdGeWork$qd1labelled=statedf$State[match(EdGeWork$state,statedf$Code)]
+  
+  ggplot(EdGeWork, aes(x=qd1labelled)) + geom_bar(stat="count")
+  
+```
+q4
+```{r}
+
+  fix_labels <- function(x, TextIfMissing) {
+    val <- attr(x, "labels", exact = TRUE)
+    if (is.null(val)) TextIfMissing else val
+  }
+  
+  mylabels=fix_labels(EdGeWork$q4,NA)
+  statedf=data.frame(Code=mylabels,State=names(mylabels))
+  EdGeWork$q4labelled=EdGeWork$q4labelled[match(EdGeWork$q4labelled,EdGeWork$q4labelled)]
+  
+  ggplot(EdGeWork, aes(x=q4labelled)) + geom_bar(stat="count")
+
+```
+d1 fill q4
+```{r}
+
+
+ fix_labels <- function(x, TextIfMissing) {
+    val <- attr(x, "labels", exact = TRUE)
+    if (is.null(val)) TextIfMissing else val
+  }
+ 
+  mylabels=fix_labels(EdGenderWork$state,NA)
+  statedf=data.frame(Code=mylabels,State=names(mylabels))
+  EdGenderWork$statename=statedf$State[match(EdGenderWork$state,statedf$Code)]
+
+
+
+
+
+
+
+
+
+
+
+
+
+EdGeWork$q4 <- factor(EdGeWork$q4,
++ levels = c(1,2,3,4),
++ labels = c("Men & Women Equally", "Women Over Men", "Men Over Women", "Don't Know/Refused"))
+
+EdGeWork$qd1 <- factor(EdGeWork$qd1,
++ levels = c(1,2),
++ labels = c("Yes", "No"))
+
+q <- ggplot(EdGeWork, aes(x = q4, fill = qd1))
+q + geom_bar(stat = "count")
+```
+
+# Education and Change in Gender Equality (Q43) !!!
+
+```{r}
+
+EdGeWork$q43 <- factor(EdGeWork$q43, levels=c(1,2),labels=c("Made Change","Make Change"))
+ 
+GenEqual <- EdGeWork %>%
+  group_by(educ2) %>%
+  count(q43)
+ 
+names(GenEqual) <- c("educ2","q43","resp")
+ 
+GenEqual %>% ggplot(aes(educ2,resp,fill=q43)) + geom_bar(stat="identity",position="dodge")
+
+```
+
+# Education Level and Difficult for Genders to get Execuctive (Q44)
+fill male/female 
+```{r}
+
+
+ fix_labels <- function(x, TextIfMissing) {
+    val <- attr(x, "labels", exact = TRUE)
+    if (is.null(val)) TextIfMissing else val
+  }
+ 
+  mylabels=fix_labels(EdGeWork$q44,NA)
+  statedf=data.frame(Code=mylabels,State=names(mylabels))
+  EdGeWork$q44labelled=statedf$State[match(EdGenderWork$q44,statedf$Code)]
+
+  str(EdGeWork$sex)
+  
+  
+  EdGeWorksexq44=data.frame(as.factor(EdGeWork$sex) )
+  EdGeWorksexq44$sex=as.numeric(as.character(EdGeWorksexq44$as.factor.EdGeWork.sex.))
+  
+  EdGeWorksexq44$q44labelled=EdGeWork$q44labelled       
+  
+  ggplot(EdGeWorksexq44$sex, aes(x=q44labelled))+geom_bar(stat="count")
+
+
+
+
+
+
+
+
+
+
+
+EdGeWork$q44 <- factor(EdGeWork$q44,
+                       levels = c(1,2,3,4),
+                       labels = c("Easier for men", "Easier for women", "No Difference", "Don't Know/Refused"))
+
+EdGeWork$sex <- factor(EdGeWork$sex,
+                       levels = c(1,2),
+                       labels = c(Male, Female))
+
+h <- ggplot(EdGeWork, aes(x = q44, fill = sex))
+h + geom_bar(stat = "count")
+```
+
+# Gender roles and Age(Q48,age)
+
+```{r}
+
+ fix_labels <- function(x, TextIfMissing) {
+    val <- attr(x, "labels", exact = TRUE)
+    if (is.null(val)) TextIfMissing else val
+  }
+ 
+  mylabels=fix_labels(EdGeWork$q48,NA)
+  statedf=data.frame(Code=mylabels,State=names(mylabels))
+  EdGeWork$q48labelled=statedf$State[match(EdGeWork$q48,statedf$Code)]
+  
+str(EdGeWork$q48labelled)
+
+
+EdGeWorkageq48=data.frame(as.factor(EdGeWork$age) )
+  EdGeWorkageq48$age=as.numeric(as.character(EdGeWorkageq48$as.factor.EdGeWork.age.))
+  
+  EdGeWorkageq48$q48labelled=EdGeWork$q48labelled
+
+  # insert subset commands
+  
+  EdGeWorkageq48=EdGeWorkageq48[EdGeWorkageq48$q48labelled %in% c("Or, both are about equally focused on their jobs or careers", "The men I know are more focused on their jobs or careers than the women","The women I know are more focused on their jobs or careers than the men"),]
+  
+EdGeWorkageq48$q48labelled=factor(EdGeWorkageq48$q48labelled)  
+
+levels(EdGeWorkageq48$q48labelled)[1]="Both are equally focused on their jobs or careers."  
+levels(EdGeWorkageq48$q48labelled)  
+
+ggplot(EdGeWorkageq48,aes(q48labelled,age))+geom_boxplot()+coord_flip()+labs(x="")
+  
+  EdGeWorkageq48%>%group_by(q48labelled)%>%summarize(Mean.Age=mean(age)) %>%ggplot(aes(q48labelled,Mean.Age,group=1))+geom_point()+geom_line()+coord_flip()+labs(x="")
+  
+  
+  meanages=EdGeWorkageq48%>%group_by(q48labelled)%>%summarize(Mean.Age=mean(age))
+  
+  meanages
+  summary(EdGeWorkageq48)
+  ggplot(EdGeWork,aes(age))+geom_boxplot()
+hist(EdGeWork$age)
+
+EdGeWork$q48 <- factor(EdGeWork$q48,
+                       levels = c(1,2,3,4),
+                       labels = c("The men I know are more focused on their jobs or careers than the women.", "The women I know are more focused on their jobs or careers than the men.", "Both are about equally focused on their jobs or careers", "Depends/Can't Generalize", "Don't know/Refused."))
+
+
+
+ggplot(EdGeWork,aes(x=age,fill=q48labelled))+geom_boxplot()
+```
+
+mydata$v1 <- factor(mydata$v1,
+levels = c(1,2,3),
+labels = c("red", "blue", "green"))

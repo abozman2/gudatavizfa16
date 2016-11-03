@@ -1,0 +1,112 @@
+---
+title: "Tallest Buildings"
+author: "Adam Bozman and Kelsey Bajet"
+date: "October 9, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, include=TRUE)
+```
+
+```{r, message=FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+library(magrittr)
+```
+
+
+```{r}
+tallestbuildings=read.csv("tallestbuildings.csv")
+```
+
+
+1. Buildings in Each City
+```{r, eval=TRUE}
+tallestbuildings %>%
+  group_by(City) %>%
+  summarise(Building_count = n()) %>%
+  arrange(desc(Building_count))
+```
+
+
+2. Plot of cities in order of the mean height of buildings in a city
+```{r}
+tallestbuildings$Height..ft. = as.character(tallestbuildings$Height..ft.)
+
+tallestbuildings$Height..ft. = as.numeric(gsub(",","",tallestbuildings$Height..ft.))
+
+City_Mean <- tallestbuildings %>%
+  separate(City,c("City","Country"), sep = "ÿ") %>%
+  group_by(City) %>% 
+  summarise(avg_height = mean(Height..ft.)) %>%
+  arrange(desc(avg_height))
+
+City_Mean %>% ggplot(aes(x=reorder(City,desc(-avg_height)),y=avg_height)) + geom_bar(stat="identity") + coord_flip() + labs(x="City",y="Average Height")
+```
+
+
+3. Buildings in Each Country
+```{r}
+library(countrycode)
+
+Country_Buildings = tallestbuildings %>% separate(City,c("City","Country"), sep = "ÿ")
+Country_Buildings$Country = gsub("\\(","",Country_Buildings$Country)
+Country_Buildings$Country = gsub("\\)","",Country_Buildings$Country)
+
+Country_Buildings$Countryname=countrycode(Country_Buildings$Country,"iso2c","country.name")
+
+Country_Buildings %>%
+  group_by(Countryname) %>%
+  summarise(Building_Count = n()) %>%
+  arrange(desc(Building_Count)) %>%
+  ggplot(aes(x=reorder(Countryname,desc(-Building_Count)),y=Building_Count)) + geom_bar(stat="identity") + coord_flip() + labs(x="Country",y="Building Count")
+```
+
+
+4. Plot of countries in order of the mean height of buildings in a country
+```{r}
+Country_mean <- tallestbuildings %>% separate(City,c("City","Country"), sep = "ÿ")
+Country_mean$Country = gsub("\\(","",Country_mean$Country)
+Country_mean$Country = gsub("\\)","",Country_mean$Country)
+
+Country_mean$Countryname=countrycode(Country_mean$Country,"iso2c","country.name")
+
+Country_mean$Height..ft. = as.character(Country_mean$Height..ft.)
+
+Country_mean$Height..ft. = as.numeric(gsub(",","",Country_mean$Height..ft.))
+
+Country_mean %>%
+  group_by(Countryname) %>%
+  summarise(avg_height = mean(Height..ft.)) %>%
+  arrange(desc(avg_height)) %>%
+  ggplot(aes(x=reorder(Countryname,desc(-avg_height)),y=avg_height)) + geom_bar(stat="identity") + coord_flip() + labs(x="Country",y="Average Height")
+```
+
+
+5. Country by Color
+```{r}
+Country_mean %>%
+  group_by(Countryname) %>%
+  summarise(avg_height = mean(Height..ft.)) %>%
+  ggplot(aes(x=reorder(Countryname,desc(-avg_height)),y=avg_height, fill=Countryname)) + geom_bar(stat="identity") + coord_flip() + labs(x="Country",y="Average Height") + scale_fill_discrete(name="Country")
+```
+
+
+6. Mean Heights of Buildings by Purpose
+```{r}
+Building_usage = tallestbuildings %>% 
+  separate(Use,c("Use","Use2","Use3"), sep = " / ")
+
+Building_usage$Height..ft. = as.character(Building_usage$Height..ft.)
+Building_usage$Height..ft. = as.numeric(gsub(",","",Building_usage$Height..ft.))
+
+Building_usage = Building_usage %>%
+  gather(Use_Number,value=Use,Use2,Use3,9:10,na.rm=TRUE)
+
+Building_usage %>%
+  group_by(Use) %>%
+  summarise(avg_height = mean(Height..ft.)) %>%
+  arrange(desc(avg_height))
+```
